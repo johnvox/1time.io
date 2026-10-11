@@ -18,14 +18,14 @@ const description = `Privacy policy for ${siteHost}. Zero-knowledge architecture
 
     <div class="about-page">
         <h1>Privacy Policy</h1>
-        <p class="subtitle">Last updated: September 15, 2026</p>
+        <p class="subtitle">Last updated: October 11, 2026</p>
 
         <div class="about-section">
             <h2>The short version</h2>
             <p>
                 {siteHost} is built on a zero-knowledge architecture. Your secrets are encrypted
                 in your browser before they reach our server. We cannot read them. We do not track you.
-                We do not use cookies. We do not run analytics.
+                We do not use cookies. We do not use third-party analytics.
             </p>
         </div>
 
@@ -40,13 +40,15 @@ const description = `Privacy policy for ${siteHost}. Zero-knowledge architecture
                 </li>
                 <li>
                     <strong>Automatic deletion:</strong> Encrypted data is permanently deleted after
-                    the link is opened once, or after the expiry period you choose (1 hour to 30 days),
+                    the link is opened once — or after the last view, if you allowed more than one
+                    (up to 10) — or after the expiry period you choose (1 hour to 30 days),
                     whichever comes first.
                 </li>
                 <li>
                     <strong>Server logs:</strong> Standard web server logs (IP address, timestamp,
-                    URL path, user agent) may be retained for up to 14 days for security and
-                    abuse prevention. These logs never contain secret content or decryption keys.
+                    URL path, user agent, referring site) are retained for up to 28 days for security,
+                    abuse prevention and aggregate usage statistics. These logs never contain secret
+                    content or decryption keys.
                 </li>
                 <li>
                     <strong>Aggregate counters:</strong> We maintain simple counters — total secrets
@@ -62,8 +64,8 @@ const description = `Privacy policy for ${siteHost}. Zero-knowledge architecture
             <ul>
                 <li>No accounts or personal information — the service works without sign-up</li>
                 <li>No cookies — not even a session cookie</li>
-                <li>No analytics or tracking scripts — no Google Analytics, no pixels, no fingerprinting. We only keep an aggregate secret count with no identifying information</li>
-                <li>No third-party requests — no CDNs, ad networks, or external resources</li>
+                <li>No third-party analytics or tracking scripts — no Google Analytics, no pixels, no fingerprinting.</li>
+                <li>No third-party scripts, fonts, ad networks or embedded resources. </li>
                 <li>No plaintext secrets — encryption happens client-side before transmission</li>
             </ul>
         </div>
