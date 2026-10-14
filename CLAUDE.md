@@ -9,7 +9,7 @@ This file adds the **product, growth and analytics context** that has no home th
 - **How it works:** 1time.io is a zero-knowledge one-time secret/file sharing tool. All encryption is client-side (AES-256-GCM + HKDF-SHA256); the server stores only ciphertext, and the decryption key lives only in the URL fragment. See "How It Works (zero-knowledge protocol)" in AGENTS.md.
 - **Canonical crypto:** `frontend/src/lib/protocol.mjs` — shared, dependency-free, runs in browser + Node, and is synced into the CLI (`cli/`) and the Zapier app (`zap/`). **Do not fork it — edit `protocol.mjs` and re-sync.**
 - **Layout:** Go backend in `backend/`, Astro static frontend in `frontend/` (islands in `frontend/src/islands/`, builds to `frontend/build`), first-party CLI in `cli/`, Chrome extension in `extension/`, Zapier integration in `zap/`, ops/analytics scripts in `scripts/`.
-- **Hard constraints:** frontend Lighthouse performance is not optional — keep CSS/JS off the initial render path per the "Frontend CSS/JS Performance" sections in AGENTS.md. Keep the frontend and backend `100 MB` file limits identical; the upload body is pinned to exactly 100 MiB (nginx `client_max_body_size 100m` = Cloudflare Free's edge cap), and the file limit is that minus a 64 KiB overhead reserve.
+- **Hard constraints:** frontend Lighthouse performance is not optional — keep CSS/JS off the initial render path per the "Frontend CSS/JS Performance" sections in AGENTS.md. Keep the frontend and backend `250 MB` file limits identical (250 MiB minus a 64 KiB overhead reserve, sent in 4 MiB chunks). A single request body is still pinned to exactly 100 MiB (nginx `client_max_body_size 100m` = Cloudflare Free's edge cap), which limits only the old multipart path.
 
 ## Analytics
 

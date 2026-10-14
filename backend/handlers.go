@@ -89,20 +89,21 @@ func resolveSaveScheme(legacyHashedKey, readTokenHash string, version int) (stor
 }
 
 const (
-	// Cloudflare's Free plan drops request bodies over 100 MiB at the edge, so the
-	// whole multipart body is pinned to that and the plaintext limit derived from
-	// it. Keep nginx's client_max_body_size equal to this (100m).
+	// Cloudflare's Free plan drops request bodies over 100 MiB at the edge, so a
+	// single-request (multipart) upload is pinned to that. Keep nginx's
+	// client_max_body_size equal to this (100m).
 	maxFileUploadBodyBytes = 100 * 1024 * 1024
 	// fileUploadOverheadBytes reserves room for the AES-GCM IV and tag, multipart
 	// boundaries and the form fields; the real overhead is under 1 KiB.
 	fileUploadOverheadBytes = 64 * 1024
 	// maxFileSize is the limit on the ORIGINAL plaintext file, matched by
 	// Constants.maxFileSizeBytes on the frontend. The server only sees ciphertext.
-	maxFileSize        = maxFileUploadBodyBytes - fileUploadOverheadBytes
+	// Chunked uploads are not bound by the single-request cap above.
+	maxFileSize        = 250*1024*1024 - fileUploadOverheadBytes
 	maxMultipartMemory = 4 * 1024 * 1024
 	// Slice i lands at i*fileChunkBytes; must equal CHUNK_BYTES (fileUpload.js) and fileChunkBytes (cli/lib.mjs).
 	fileChunkBytes = 4 * 1024 * 1024
-	maxFileChunks  = maxFileUploadBodyBytes / fileChunkBytes
+	maxFileChunks  = (maxFileSize + fileUploadOverheadBytes + fileChunkBytes - 1) / fileChunkBytes
 )
 const maxFileViews = 10
 

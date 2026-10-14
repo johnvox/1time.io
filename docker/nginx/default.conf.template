@@ -76,8 +76,8 @@ server {
     }
 
     location = /api/saveFile {
-        # A 100 MB file is 25 chunk requests; the burst lets one go up unthrottled.
-        limit_req zone=api_upload burst=30 nodelay;
+        # A 250 MB file is 63 chunk requests; the burst lets one go up unthrottled.
+        limit_req zone=api_upload burst=63 nodelay;
         client_body_timeout 10m;
         proxy_pass http://${BACKEND_UPSTREAM};
         proxy_http_version 1.1;

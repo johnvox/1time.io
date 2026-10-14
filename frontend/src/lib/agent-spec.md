@@ -115,7 +115,7 @@ Chunked upload, recommended for anything over a few MiB: a dropped connection th
     POST /api/saveFile?src=<app>&u=<uploadId>&i=<index>&n=<chunkCount>
 
 - `u`: an upload id you generate, 22 characters from the key alphabet (secure RNG). One per file.
-- `i`: `0` to `n − 1`. `n`: `1` to `25`. Every slice but the last must be exactly 4 MiB (4194304 bytes).
+- `i`: `0` to `n − 1`. `n`: `1` to `63`. Every slice but the last must be exactly 4 MiB (4194304 bytes).
 - `readTokenHash`, `v`, `duration`, `views` and `n` must be the same on every slice; a slice that differs is rejected, and a missing or out-of-range `duration`, or an out-of-range `views`, gets `400` instead of being clamped.
 - Slices before the last answer `200 {"status":"ok"}`. The request that completes the file answers `200 {"status":"ok","newId":"<22 chars>"}`; until then the file does not exist and no link can be built. The stored file is the same encrypted blob a single request would have stored.
 - Resending a slice is safe as long as its bytes are identical: it lands in the same place, and for an hour after the file is complete any slice returns the same `newId`. A slice index accepts only the bytes first sent for it; different bytes get `400`, so if you re-encrypt the file (for example after a restart), start a new upload with a new `u`. After that hour the upload id is forgotten, and a resend starts a new upload with a new `newId`. Retry a slice after a network error, a timeout, `408`, `429` or any `5xx` (including Cloudflare's `52x`, and `503 {"status":"retry"}` while another request is finishing the file), with backoff. Do not retry `400 {"status":"error"}`: the slice or its fields are wrong.
@@ -161,11 +161,11 @@ Before saving, confirm `saveSchemes` contains `3`. If it does not, the host is t
 - Expiry: 1 second to 30 days, default 1 day
 - Views or downloads: 1 to 10, default 1
 - `saveSecret` request body: 25 MiB (about 18 MiB of plaintext after encryption and base64)
-- File size (plaintext): just under 100 MiB. The upload body is capped at exactly 100 MiB, and 64 KiB of that is reserved for the IV, tag and multipart overhead. A chunked upload is at most 25 slices of 4 MiB
+- File size (plaintext): just under 250 MiB; 64 KiB is reserved for the IV, tag and multipart overhead. A chunked upload is at most 63 slices of 4 MiB. A single-request (multipart) upload is capped at exactly 100 MiB of body by the CDN, so files over about 100 MiB must be sent in slices
 - `get` and `getFile` request body: 1 KiB
 - `secretStatus`: 128 ids, 8 KiB
 - Rate limit, text saves: about 45 per minute per IP, burst 10, then `429`
-- Rate limit, `saveFile` requests (each slice counts): about 120 per minute per IP, burst 30, then `429`
+- Rate limit, `saveFile` requests (each slice counts): about 120 per minute per IP, burst 63, then `429`
 - Rate limit, reads: about 60 per minute per IP, burst 15, then `429`
 
 On `429` for a save: back off and retry. On `429` for a read: surface it to the user rather than retrying automatically.
