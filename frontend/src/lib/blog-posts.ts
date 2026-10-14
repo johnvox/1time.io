@@ -85,7 +85,7 @@ export const blogPosts: BlogPost[] = [
                 "headline": "Bitwarden Send Alternative — Free, No Account Required",
                 "description": "Need to share a secret without a Bitwarden account? Use zero-knowledge one-time links for encrypted password and file sharing.",
                 "datePublished": "2026-03-06",
-                "dateModified": "2026-08-09",
+                "dateModified": "2026-10-14",
                 "author": {
                     "@type": "Person",
                     "name": "Igor Ermakov",
@@ -219,7 +219,7 @@ export const blogPosts: BlogPost[] = [
                 "headline": "Best Firefox Send Alternative — Free & Self-Hostable",
                 "description": "Firefox Send is gone. Share encrypted files with zero-knowledge one-time links. Free, open source, no signup, and self-hostable.",
                 "datePublished": "2026-04-04",
-                "dateModified": "2026-08-09",
+                "dateModified": "2026-10-14",
                 "author": {
                     "@type": "Person",
                     "name": "Igor Ermakov",
