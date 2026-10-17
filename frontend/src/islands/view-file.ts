@@ -1,7 +1,7 @@
 import {Constants, formatRemaining} from '../lib/util.js';
 import {hashSecretKey, isValidLinkToken} from '../lib/protocol.mjs';
 import {formatBytes, getFile} from '../lib/fileApi.js';
-import {decryptFile, downloadFile} from '../lib/fileProtocol.js';
+import {createFileUrl, decryptFile, saveFileUrl} from '../lib/fileProtocol.js';
 
 const form = document.querySelector<HTMLFormElement>('#view-file-form');
 if (form) {
@@ -19,6 +19,8 @@ if (form) {
     const progressFill = form.querySelector<HTMLElement>('[data-progress-fill]')!;
     const progressText = form.querySelector<HTMLElement>('[data-progress-text]')!;
     const downloadState = form.querySelector<HTMLElement>('[data-download-state]')!;
+    const saveAgainBtn = form.querySelector<HTMLButtonElement>('[data-save-again-btn]')!;
+    const saveAgainHint = form.querySelector<HTMLElement>('[data-save-again-hint]')!;
 
     const hash = window.location.hash || '';
     const linkKey = hash.length > 1 ? hash.slice(1) : '';
@@ -36,11 +38,34 @@ if (form) {
         showOnly(brokenLinkSection);
     }
 
+    let savedFile: {url: string; name: string} | null = null;
+    saveAgainBtn.addEventListener('click', () => {
+        if (savedFile) {
+            saveFileUrl(savedFile.url, savedFile.name);
+        }
+    });
+    window.addEventListener('pagehide', (e) => {
+        if (savedFile && !e.persisted) {
+            URL.revokeObjectURL(savedFile.url);
+            savedFile = null;
+        }
+    });
+
+    const warnBeforeLeaving = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        e.returnValue = '';
+    };
+
     let isDownloading = false;
     type Phase = 'idle' | 'downloading' | 'decrypting';
     const setPhase = (phase: Phase) => {
         const busy = phase !== 'idle';
         isDownloading = busy;
+        if (busy) {
+            window.addEventListener('beforeunload', warnBeforeLeaving);
+        } else {
+            window.removeEventListener('beforeunload', warnBeforeLeaving);
+        }
         downloadBtn.disabled = busy;
         secretKeyInput.disabled = busy;
         if (phase === 'idle') {
@@ -132,7 +157,9 @@ if (form) {
             try {
                 setPhase('decrypting');
                 const {meta, fileBytes} = await decryptFile(result.data, fullSecretKey);
-                downloadFile(meta, fileBytes);
+                savedFile = {url: createFileUrl(meta, fileBytes), name: meta.name};
+                setPhase('idle');
+                saveFileUrl(savedFile.url, savedFile.name);
                 // Older backends omit the header and only support one download.
                 const viewsLeft = typeof result.viewsLeft === 'number' ? result.viewsLeft : 0;
                 const expiresIn = typeof result.expiresIn === 'number' ? result.expiresIn : 0;
@@ -140,7 +167,7 @@ if (form) {
                 downloadState.textContent = viewsLeft > 0
                     ? `This 1time link has ${viewsLeft} ${viewsLeft === 1 ? 'download' : 'downloads'} remaining and will self-destruct after the last.${expiryClause}`
                     : 'One-time delivery complete. The encrypted file has been deleted from our servers.';
-                setPhase('idle');
+                saveAgainHint.toggleAttribute('hidden', viewsLeft > 0);
                 showOnly(downloadedSection);
             } catch {
                 // Download succeeded (and was consumed) but decrypt failed — be honest.

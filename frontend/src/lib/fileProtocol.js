@@ -112,14 +112,19 @@ export async function decryptFile(encryptedBytes, fullSecretKey) {
 }
 
 /**
- * Trigger a file download in the browser from decrypted bytes
+ * Hold decrypted bytes in one Blob behind an object URL. The caller revokes it.
  */
-export function downloadFile(meta, fileBytes) {
-    const blob = new Blob([fileBytes], {type: meta.type});
-    const url = URL.createObjectURL(blob);
+export function createFileUrl(meta, fileBytes) {
+    return URL.createObjectURL(new Blob([fileBytes], {type: meta.type}));
+}
+
+/**
+ * Trigger a browser download of an object URL.
+ * Never revoke the URL right after: iOS Safari starts the download asynchronously.
+ */
+export function saveFileUrl(url, name) {
     const a = document.createElement('a');
     a.href = url;
-    a.download = meta.name;
+    a.download = name;
     a.click();
-    URL.revokeObjectURL(url);
 }
