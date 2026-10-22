@@ -7,9 +7,11 @@ ARG NPM_VERSION=11.12.1
 
 WORKDIR /src/frontend
 
-ARG SHOW_BLOG=true
+ARG SHOW_BLOG="false"
+ARG SHOW_SEO="false"
 
 ENV PUBLIC_SHOW_BLOG=${SHOW_BLOG}
+ENV PUBLIC_SHOW_SEO=${SHOW_SEO}
 
 RUN npm install -g npm@${NPM_VERSION}
 

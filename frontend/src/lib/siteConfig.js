@@ -8,6 +8,15 @@ export function isBlogEnabled() {
     return import.meta.env.PUBLIC_SHOW_BLOG !== 'false';
 }
 
+export function isSeoEnabled() {
+    return import.meta.env.PUBLIC_SHOW_SEO !== 'false';
+}
+
+export function isSeoDisable() {
+    return !isSeoEnabled();
+}
+
+
 export function absoluteUrl(path = '/') {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
     return new URL(normalizedPath, `${siteUrl}/`).toString();
