@@ -1,6 +1,5 @@
 ---
 import {minifyCss} from '../lib/minifyCss.js';
-
 import globalsCss from '../styles/globals.css?raw';
 import homeCss from '../styles/home.css?raw';
 import fileSharingCss from '../styles/file-sharing.css?raw';
@@ -13,6 +12,16 @@ import articleCss from '../styles/article.css?raw';
 import blogIndexCss from '../styles/blog-index.css?raw';
 import mySecretsCss from '../styles/mySecrets.css?raw';
 import developersCss from '../styles/developers.css?raw';
+import { isRelatedEnabled, isSeoEnabled } from '../lib/siteConfig';
+
+function siteConfigToCss() {
+    return `
+        :root {
+            --genSeo: ${isSeoEnabled() ? 'block' : 'none'};
+            --genRelated: ${isRelatedEnabled() ? 'block' : 'none'};
+        }
+    `;
+}
 
 const cssByName = {
     globals: globalsCss,
@@ -27,6 +36,7 @@ const cssByName = {
     'blog-index': blogIndexCss,
     'my-secrets': mySecretsCss,
     developers: developersCss,
+    'site-config': siteConfigToCss(),
 } as const;
 
 const minified = new Map<string, string>();
@@ -41,8 +51,8 @@ function getMinified(name: keyof typeof cssByName): string {
 interface Props {
     name: keyof typeof cssByName;
 }
-
 const {name} = Astro.props;
 const css = getMinified(name);
 ---
-<style set:html={css} data-inline-css={name}></style>
+<style id="{name}" set:html={css} data-inline-css={name}></style>
+{name === 'globals' ? <style set:html={getMinified('site-config')} data-inline-css="site-config"></style> : null}

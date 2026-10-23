@@ -42,6 +42,7 @@ services:
       args:
         APP_HOSTNAME: ${APP_HOSTNAME:-1time.io}
         SHOW_BLOG: ${SHOW_BLOG:-false}
+        SHOW_RELATED: ${SHOW_RELATED:-false}
     restart: unless-stopped
     environment:
       APP_HOSTNAME: ${APP_HOSTNAME:-1time.io}

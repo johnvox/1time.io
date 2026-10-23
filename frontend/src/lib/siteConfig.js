@@ -12,10 +12,9 @@ export function isSeoEnabled() {
     return import.meta.env.PUBLIC_SHOW_SEO !== 'false';
 }
 
-export function isSeoDisable() {
-    return !isSeoEnabled();
+export function isRelatedEnabled() {
+    return import.meta.env.PUBLIC_SHOW_RELATED !== 'false';
 }
-
 
 export function absoluteUrl(path = '/') {
     const normalizedPath = path.startsWith('/') ? path : `/${path}`;
